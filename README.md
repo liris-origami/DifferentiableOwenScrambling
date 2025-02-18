@@ -53,11 +53,10 @@ Loss parameters:
 
 The scripts outputs multiple file:
 
-* {prefix}_16.dat: points after optimization
+* {prefix}_k.dat: points after optimization after applying depth k
 * {prefix}_soft.dat: points after optimization where the tree is not binarized
 * {prefix}_init.dat: initial points (after the starting random tree is applied, but before optimization)
 * {prefix}_soft_tree.txt: floating point values stored in the tree
-
 where {prefix} is the parameter passed to the script
 
 # Plotting points 
@@ -65,3 +64,13 @@ where {prefix} is the parameter passed to the script
 A simple python script is provided in order to plot the points. It requires numpy and matplotlib. 
 
 `python plot.py pts.dat`
+
+# Example command
+
+Inside the `build/` directory (see Building section): 
+
+`./DifferentiableOwenW2 -n 1024 -d 2 --nits 128 --lr 1e5 --depth 16 --fill_depth 32 --prefix out`
+
+Then, run the following command to view the resulting point set:
+
+`python ../plot.py out_17.dat`
