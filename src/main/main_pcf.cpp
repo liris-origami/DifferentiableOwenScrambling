@@ -79,7 +79,7 @@ int main(int argc, char** argv)
     std::vector<double> outPCF(pcf.nbins, 0.0);
 
     auto loss = [&](const PointArray& array, PointArray& grad){
-	    return W2Loss2D(array, grad);
+	    return pcf(array, grad, outPCF);
     };
 
     if (fillDepth > Depth)

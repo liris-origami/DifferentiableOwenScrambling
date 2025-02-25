@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 
     SetGBNSigma(gbnSigma);
     auto loss = [&](const PointArray& array, PointArray& grad){
-	    return W2Loss2D(array, grad);
+	    return GBNLoss(array, grad);
     };
 
     if (fillDepth > Depth)
