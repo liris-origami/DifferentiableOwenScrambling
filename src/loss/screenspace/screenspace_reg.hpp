@@ -47,7 +47,10 @@ struct SSRegLoss
 
         // First compute errors. Leave parallelization to energy computation        
         double tot_energy = 0.0;
+
+#ifdef WITH_OMP
         #pragma omp parallel for reduction(+: tot_energy)
+#endif
         for (unsigned int i = 0; i < patchSize; i++)
         {
             for (unsigned int j = 0; j < patchSize; j++)
@@ -64,7 +67,10 @@ struct SSRegLoss
 
         // First compute max of ss energy
         double tot_ss_energy = 0.0;
+
+#ifdef WITH_OMP
         #pragma omp parallel for reduction(+: tot_ss_energy)
+#endif 
         for (unsigned int i = 0; i < patchSize; i++)
         {
             for (unsigned int j = 0; j < patchSize; j++)
@@ -108,7 +114,9 @@ struct SSRegLoss
 
         // First compute errors. Leave parallelization to energy computation
         // Nevermind: do not, typically N << patchSize * patchSize
-	#pragma omp parallel for
+#ifdef WITH_OMP
+    	#pragma omp parallel for
+#endif
         for (unsigned int i = 0; i < patchSize; i++)
         {
             for (unsigned int j = 0; j < patchSize; j++)
@@ -120,7 +128,9 @@ struct SSRegLoss
 
         double totalEnergy = 0.;
         double ssenergy    = 0.;
+#ifdef WITH_OMP
         #pragma omp parallel for reduction(+: ssenergy,totalEnergy)
+#endif
         for (unsigned int i = 0; i < patchSize; i++)
         {
             for (unsigned int j = 0; j < patchSize; j++)

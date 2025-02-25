@@ -9,24 +9,18 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 option(WITH_GEOGRAM "Build with geogram" OFF)
 option(WITH_UTK "Build with UTK" OFF)
-option(OMP_TRANSPORT "Disable the use of omp for 2D OT computation" ON)
+option(WITH_OMP "Use of OMP" ON)
 
-include(openmp)
+if (WITH_OMP)
+    include(openmp)
+    message("Enabling OMP for OT in 2D")
+    add_compile_definitions(WITH_OMP)
+endif()
+
 include(cli11)
-
-IF (${WITH_GEOGRAM})
-    # include(geogram)
-    # message("Adding with geogram flagg")
-    # add_compile_definitions(WITH_GEOGRAM)
-ENDIF()
 
 if (${WITH_UTK})
     include(utk)
-ENDIF()
-
-IF (OMP_TRANSPORT)
-    message("Enabling OMP for OT in 2D")
-    add_compile_definitions(WITH_OMP)
 ENDIF()
 
 ADD_LIBRARY(SOURCES
@@ -50,12 +44,9 @@ ADD_LIBRARY(SOURCES
 )
 add_compile_definitions(DATA_PATH="${CMAKE_SOURCE_DIR}/data")
 
-IF (${WITH_GEOGRAM})
+if (WITH_OMP)
     target_link_libraries(SOURCES OpenMP::OpenMP_CXX)
-    # target_link_libraries(SOURCES OpenMP::OpenMP_CXX geogram exploragram)
-ELSE()
-    target_link_libraries(SOURCES OpenMP::OpenMP_CXX)
-ENDIF()
+endif()
 
 target_include_directories(SOURCES PRIVATE ${CMAKE_SOURCE_DIR}/src)
 

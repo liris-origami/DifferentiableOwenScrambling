@@ -17,7 +17,7 @@ Repository for the paper : [Differentiable Owen Scrambling](https://dl.acm.org/d
 
 # Dependancies
 
-The code only requires a compiler supporting C++17 (C++11 possible by removing constexpr).
+The code only requires a compiler supporting C++17 (C++11 possible by removing constexpr) and OpenMP installed. If OmpenMP cannot be found or if it fails to compile, you may pass the `-DWITH_OMP=OFF` option to the cmake call.
 
 # Building
 
@@ -26,7 +26,7 @@ The project is setup with cmake. The commands to run are the following:
 ``` bash
 mkdir build
 cd build
-cmake ..
+cmake .. # eventually cmake .. -DWITH_OMP=OFF
 make -j 8 
 ```
 

@@ -40,7 +40,9 @@ double gbn_toroidal_forward_backward(const PointArray& array, PointArray& grad, 
 
     grad.zeros();
 
+#ifdef WITH_OMP
     #pragma omp parallel for reduction(+: rloss)
+#endif
     for (unsigned int k = 0; k < N; k++)
     {
         for (unsigned int l = 0; l < N; l++)

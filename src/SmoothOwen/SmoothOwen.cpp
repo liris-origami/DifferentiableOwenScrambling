@@ -74,7 +74,10 @@ void SmoothOwenScrambling::ExportGrad(const std::string& filename, const BinaryA
 
     out << std::setprecision(20) << std::fixed;
 
+
+#ifdef WITH_OMP
     #pragma omp parallel for
+#endif
     for (unsigned int i = 0; i < pts.shape[0]; i++)
     {
         unsigned int select = 0;
@@ -127,7 +130,10 @@ void SmoothOwenScrambling::forward(const BinaryArray& pts, PointArray& out)
 {
     for (unsigned int d = 0; d < pts.shape[1]; d++)
     {
+
+#ifdef WITH_OMP
         #pragma omp parallel for
+#endif
         for (unsigned int i = 0; i < pts.shape[0]; i++)
         {
             unsigned int select = 0;
@@ -166,7 +172,10 @@ void FillRandomLeftoverBits(PointArray& dest, unsigned int seed, unsigned int De
 
 void ApplyLeftoverBits(PointArray& dest, const PointArray& bits)
 {
+
+#ifdef WITH_OMP
     #pragma omp parallel for
+#endif
     for (unsigned int i = 0; i < dest.shape[0]; i++)
     {
         for (unsigned int j = 0; j < dest.shape[1]; j++)
@@ -181,7 +190,10 @@ void SmoothOwenScrambling::backward(const PointArray& gradients, double lr)
 {   
     for (unsigned int d = 0; d < gradients.shape[1]; d++)
     {
+
+#ifdef WITH_OMP
         #pragma omp parallel for
+#endif
         for (unsigned int p = 0; p < thetas[d].size(); p++)
         {
             double gradientValue = 0.0;
@@ -199,7 +211,9 @@ void SmoothOwenScrambling::backwardStore(const PointArray& gradients, double lr,
 {   
     for (unsigned int d = 0; d < gradients.shape[1]; d++)
     {
+#ifdef WITH_OMP
         #pragma omp parallel for
+#endif
         for (unsigned int p = 0; p < thetas[d].size(); p++)
         {
             grads[{d, p}] = 0.0;
@@ -223,7 +237,10 @@ void SmoothOwenScrambling::evaluate(const BinaryArray& pts, PointArray& out, uns
 
     for (unsigned int d = 0; d < pts.shape[1]; d++)
     {
+
+#ifdef WITH_OMP
         #pragma omp parallel for
+#endif
         for (unsigned int i = 0; i < pts.shape[0]; i++)
         {
             unsigned int select = 0;

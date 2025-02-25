@@ -103,15 +103,20 @@ double IntegrationTest<Func>::operator()(const PointArray& array, PointArray& gr
         const double  gt = dataStart[0]; 
 
         double mcValue = 0.0;
-        
+
+#ifdef WITH_OMP
         #pragma omp parallel for reduction(+: mcValue)
+#endif
         for (unsigned int i = 0; i < array.shape[0]; i++)
         {
             mcValue += Func::Evaluate(Dim, array.pointAt(i), dataStart + 1, tmpGrad.pointAt(i));
         }
 
         const double error = (mcValue * invN - gt);
+
+#ifdef WITH_OMP
         #pragma omp parallel for
+#endif
         for (unsigned int i = 0; i < array.shape[0]; i++)
         {
             for (unsigned int j = 0; j < Dim; j++)

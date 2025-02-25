@@ -6,7 +6,9 @@ void float_to_bin(const PointArray& pts, unsigned char depth, BinaryArray& out)
 {
     const unsigned int N_ = (1 << depth);
 
+#ifdef WITH_OMP
     #pragma omp parallel for
+#endif
     for (unsigned int i = 0; i < pts.shape[0]; i++)
     {
         for (unsigned int j = 0; j < pts.shape[1]; j++)
@@ -23,7 +25,10 @@ void float_to_bin(const PointArray& pts, unsigned char depth, BinaryArray& out)
 
 void bin_to_float(const FuzzyBinaryArray& array, PointArray& outArray)
 {
+
+#ifdef WITH_OMP
     #pragma omp parallel for
+#endif
     for (unsigned int i = 0; i < array.shape[0]; i++)
     {
         for (unsigned int j = 0; j < array.shape[1]; j++)

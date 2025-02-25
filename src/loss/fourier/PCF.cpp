@@ -43,7 +43,9 @@ double PCF::operator()(const PointArray& pts, PointArray& grad, std::vector<doub
         double r = ra + pcfid * (rb - ra) / (double)nbins;
         double pcfValue = 0.0;
 
+#ifdef WITH_OMP
         #pragma omp parallel for reduction(+: pcfValue)
+#endif
         for (unsigned int i = 0; i < N; i++)
         {
             for (unsigned int j = i + 1; j < N; j++)
@@ -84,7 +86,9 @@ double PCF::operator()(const PointArray& pts, PointArray& grad, std::vector<doub
         mse += weight * error * error;
         
         // gradient of mse
+#ifdef WITH_OMP
         #pragma omp parallel for
+#endif
         for (unsigned int i = 0; i < N; i++)
         {
             for (unsigned int d = 0; d < D; d++)

@@ -28,7 +28,10 @@ struct SSLoss
         const unsigned int D = array[0].shape[1];
 
         // First compute errors. DO NOT Leave parallelization to energy computation (n is small and hence not well parallel !)
+
+#ifdef WITH_OMP
         #pragma omp parallel for
+#endif
         for (unsigned int i = 0; i < patchSize; i++)
         {
             for (unsigned int j = 0; j < patchSize; j++)
@@ -39,7 +42,9 @@ struct SSLoss
         }
 
         double energy = 0.;
+#ifdef WITH_OMP
         #pragma omp parallel for reduction(+: energy)
+#endif
         for (unsigned int i = 0; i < patchSize; i++)
         {
             for (unsigned int j = 0; j < patchSize; j++)

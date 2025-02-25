@@ -138,7 +138,9 @@ double W2Loss3D(const PointArray& array, PointArray& grad)
     double loss = transport3D.Compute(array.shape[0], array.data.data(), grad.data.data());
 
     const double norm = 2.0 / (double)array.shape[0];
+#ifdef WITH_OMP
     #pragma omp parallel for
+#endif
     for (unsigned int i = 0; i < grad.shape[0]; i++)
     {
         for (unsigned int j = 0; j < grad.shape[1]; j++)
