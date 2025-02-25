@@ -1,6 +1,11 @@
 #include <vector>
 #include <random>
-#include <omp.h>
+
+// #define WITH_OMP
+#ifdef WITH_OMP
+	#include <omp.h>
+#endif
+
 #include <iostream>
 #include <cstring>
 #include <algorithm>
@@ -965,8 +970,11 @@ namespace transport {
 
 		// clip a cell by a bisector between site si and sj (possibly weighted)
 		void clipCellByBissectorPlane(std::vector<Polygon>& cells, int si, int sj) const {
-
-			int tid =  omp_get_thread_num();
+			#ifdef WITH_OMP
+				int tid =  omp_get_thread_num();
+			#else
+				int tid = 0;
+			#endif
 			size_t Nv = cells[si].vertices.size();
 			if (Nv == 0) return;
 
@@ -1074,7 +1082,9 @@ namespace transport {
 			}
 
 			// we have inserted everything 3 times, so make it unique (faster than inserting to an std::set or unordered_set)
+#ifdef WITH_OMP
 #pragma omp parallel for
+#endif
 			for (int i = 0; i < vertices.size(); i++) {
 				std::sort(neighbors[i].begin(), neighbors[i].end());
 				auto last = std::unique(neighbors[i].begin(), neighbors[i].end());
@@ -1083,7 +1093,9 @@ namespace transport {
 
 			// for each Voronoi cell (to be computed), start with a square, and clip it by the bisectors returned by the Delaunay 
 			voronoi.resize(vertices.size());
+#ifdef WITH_OMP
 #pragma omp parallel for 
+#endif
 			for (int i = 0; i < vertices.size(); i++) {
 				
 				if (neighbors[i].size() == 0) {
@@ -1257,8 +1269,9 @@ namespace transport {
 		// finally, more efficient to pre-store the Hessian than computing on the fly
 		void precompute_hessian() {
 
-
-#pragma omp parallel for 
+#ifdef WITH_OMP
+#pragma omp parallel for
+#endif 
 				for (int i = 0; i < N; i++) {
 
 					double result = 0;
@@ -1364,10 +1377,16 @@ namespace transport {
 		void hessian_mult(double* rhs, double* result) {
 
 			//memset(result, 0, N * sizeof(double));
-
-#pragma omp parallel 
+#ifdef WITH_OMP
+#pragma omp parallel
+#endif 
 			{
-				int tid = omp_get_thread_num();
+				#ifdef WITH_OMP
+					int tid = omp_get_thread_num();
+				#else
+					int tid = 0;
+				#endif
+
 				if (tid <= nb_threads) {
 					int beginIdx = rowIdx[tid];
 					int endIdx = rowIdx[tid + 1];
@@ -1439,7 +1458,9 @@ namespace transport {
 				hessian_mult(&p[0], &Ap[0]);
 				double rz = 0, pAp = 0;
 
+#ifdef WITH_OMP
 #pragma omp parallel for reduction(+ : rz, pAp) 
+#endif
 				for (int i = 0; i < N; i++) {
 					rz += r[i] * z[i];
 					pAp += p[i] * Ap[i];
@@ -1466,8 +1487,9 @@ namespace transport {
 					pz++;
 					pointAp++;
 				}*/
-
+#ifdef WITH_OMP
 #pragma omp parallel for reduction(+ : rzb, rr)
+#endif
 				for (int i = 0; i < N; i++) {
 					result[i] += alpha * p[i];
 					r[i] -= alpha * Ap[i];
@@ -1481,7 +1503,9 @@ namespace transport {
 
 				double beta = rzb / rz;
 
+				#ifdef WITH_OMP
 				#pragma omp parallel for 
+				#endif
 				for (int i = 0; i < N; i++) {
 					p[i] = z[i] + beta * p[i];
 				}
@@ -1507,7 +1531,9 @@ namespace transport {
 				V.compute_dual();
 				
 				worstarea = 0;
+#ifdef WITH_OMP
 #pragma omp parallel for
+#endif
 				for (int i = 0; i < N; i++) {
 					double a;
 					Vector barycenter;
@@ -1573,12 +1599,25 @@ namespace transport {
 			// ugly hack ; while the Delaunay is most efficiently computed when vertices are spatially sorted (hence the Bowyer::sort_vertices method), 
 			// this is *also* the case for the Newton solve, since this reduces the matrix profile and improves cache coherence. So I'm ultimately calling the Bowyer::sort here.
 			N = V.vertices.size();
-#pragma omp parallel
+#ifdef WITH_OMP
+	#pragma omp parallel
+#endif			
 			{
-#pragma omp critical
-				nb_threads = omp_get_num_threads();
+				#ifdef WITH_OMP
+					#pragma omp critical
+				#endif
+				{
+				#ifdef WITH_OMP
+					nb_threads = omp_get_num_threads();
+				#else
+					nb_threads = 1;
+				#endif
+				}
 			}
-			if (N < nb_threads) nb_threads = N;
+			#ifdef WITH_OMP
+				if (N < nb_threads) nb_threads = N;
+			#endif
+
 
 			std::vector<Vector> saved_vertices = V.vertices;			
 			V.sort_vertices();
@@ -1607,7 +1646,9 @@ namespace transport {
 			double sItestsc = 0;
 			if (has_density) {
 				Vector barycenter;
+#ifdef WITH_OMP
 #pragma omp parallel for reduction(+ : sI)
+#endif
 				for (int i = 0; i < N; i++) {
 					sI += V.voronoi[i].weighted_area(&density[0], densityW, barycenter, true, V.vertices[i]);
 					//sItest += V.voronoi[i].integrateSquaredDistance2D(V.vertices[i]);

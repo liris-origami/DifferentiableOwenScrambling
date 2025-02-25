@@ -9,6 +9,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 
 option(WITH_GEOGRAM "Build with geogram" OFF)
 option(WITH_UTK "Build with UTK" OFF)
+option(OMP_TRANSPORT "Disable the use of omp for 2D OT computation" ON)
 
 include(openmp)
 include(cli11)
@@ -21,6 +22,11 @@ ENDIF()
 
 if (${WITH_UTK})
     include(utk)
+ENDIF()
+
+IF (OMP_TRANSPORT)
+    message("Enabling OMP for OT in 2D")
+    add_compile_definitions(WITH_OMP)
 ENDIF()
 
 ADD_LIBRARY(SOURCES
@@ -43,7 +49,6 @@ ADD_LIBRARY(SOURCES
     # src/SmoothOwen/SmoothPermutationOwen.cpp
 )
 add_compile_definitions(DATA_PATH="${CMAKE_SOURCE_DIR}/data")
-
 
 IF (${WITH_GEOGRAM})
     target_link_libraries(SOURCES OpenMP::OpenMP_CXX)
