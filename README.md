@@ -71,7 +71,7 @@ To reproduce the examples from Fig. 3 in the paper, you may use the following co
 
 * "Ours/W2": `./DifferentiableOwenW2 -n 1024 -d 2 --nits 128 --lr 1e5 --depth 16 --fill_depth 32 --prefix outw2`
 * "Ours/GBN": `./DifferentiableOwenGBN -n 1024 -d 2 --nits 256 --lr 1e5 --depth 16 --fill_depth 32 --gbn_sigma 0.5 --prefix outgbn`
-* "Ours/Integration": `./DifferentiableOwenDiffInt -n 1024 -d 2 --nits 128 --lr 1e5 --depth 16 --fill_depth 32 --prefix outint`
+* "Ours/Integration": `./DifferentiableOwenInt -n 1024 -d 2 --nits 128 --lr 1e5 --depth 16 --fill_depth 32 --prefix outint`
 * "Ours/l2 PCF" (LDBN target by default): `./DifferentiableOwenpcf -n 1024 -d 2 --nits 128 --lr 1e5 --depth 16 --fill_depth 32 --prefix outpcf`
 
 The pointset can be visualized using the command:
